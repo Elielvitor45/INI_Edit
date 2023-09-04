@@ -6,34 +6,38 @@ using System.Threading.Tasks;
 
 namespace IniEdit.src
 {
-    public class Playlist_Ini
+    public class PlaylistIni
     {
         public string _path { get; set; }
         public byte _headerType { get; set; }
         public byte _archiveType { get; set; }
         public byte _formatType { get; set; }
         private List<string> _playlistIni { get; set; }
-        public Playlist_Ini(string path)
+        public Afiliadas afiliadas { get; set; } = new Afiliadas();
+        public PlaylistIni(string path)
         {
             if (path != null)
             {
                 _path = path;
                 _path += @"\PLAYLIST.ini";
-                ReadPlaylist_Ini();
+                readPlaylist_Ini();
             }
         }
-        public void ReadandSaveBlock(byte headerType, byte archiveType, byte formatType) {
+        public void addBlock(byte headerType, byte archiveType, byte formatType) {
             _headerType = headerType;
             _archiveType = archiveType;
             _formatType = formatType;
-            ReadHeaderType();
+            readHeaderType();
         }
-        public void ReadandSaveAfiliadas(List<string> nameAfiliada,List<string> ipAfiliada,List<string> portAfiliada) { 
-            Afiliadas afiliadas = new Afiliadas();
-            afiliadas.AddRangeAfiliada(nameAfiliada, ipAfiliada, portAfiliada);
-            UpdatePlaylist_Ini(afiliadas);
+        public void addAfiliada(string nameAfiliada,string ipAfiliada) {
+            afiliadas.Add(nameAfiliada,ipAfiliada);
+            updatePlaylist_Ini(afiliadas);
         }
-        private bool IsAfiliadaDuplicate(Afiliada afiliada) {
+        public void addRangeAfiliada(List<string> nameAfiliada,List<string> ipAfiliada) { 
+            afiliadas.AddRange(nameAfiliada, ipAfiliada);
+            updatePlaylist_Ini(afiliadas);
+        }
+        private bool isAfiliadaDuplicate(Afiliada afiliada) {
             var condicion = _playlistIni.FirstOrDefault(x => x.Contains(afiliada.getNameAfiliada()));
             if (string.IsNullOrEmpty(condicion))
             {
@@ -44,7 +48,7 @@ namespace IniEdit.src
                 return false;
             }
         }
-        private void UpdatePlaylist_Ini(Afiliadas afiliadas) {
+        private void updatePlaylist_Ini(Afiliadas afiliadas) {
             var condicion = _playlistIni.FirstOrDefault(x => x.Contains("[AFILIADAS]"));
             if (string.IsNullOrEmpty(condicion))
             {
@@ -58,7 +62,7 @@ namespace IniEdit.src
             {
                 for (int i = 0; i < afiliadas.listAfiliada.Count; i++)
                 {
-                    if (IsAfiliadaDuplicate(afiliadas.listAfiliada[i]))
+                    if (isAfiliadaDuplicate(afiliadas.listAfiliada[i]))
                     {
                         _playlistIni.Add(afiliadas.listAfiliada[i].ToString());
                     }
@@ -68,7 +72,7 @@ namespace IniEdit.src
                 }
             }
         }
-        private void UpdatePlaylist_Ini(Relogio headers)
+        private void updatePlaylist_Ini(Relogio headers)
         {
             var condicion = _playlistIni.FirstOrDefault(x => x.Contains(headers.header));
             if (!string.IsNullOrEmpty(condicion))
@@ -99,7 +103,7 @@ namespace IniEdit.src
                 _playlistIni.Add(headers.archive);
             }
         }
-        private bool ReadPlaylist_Ini() {
+        private bool readPlaylist_Ini() {
             _playlistIni = File.ReadAllLines(_path).ToList();
             if (_playlistIni.Count > 0)
             {
@@ -108,19 +112,19 @@ namespace IniEdit.src
                 return false;
             }
         }
-        private void ReadHeaderType() {
+        private void readHeaderType() {
             if (_headerType == 0 || _headerType == 1)
             {
                 Relogio relogio = new Relogio(_headerType, _archiveType, _formatType);
-                UpdatePlaylist_Ini(relogio);
+                updatePlaylist_Ini(relogio);
             }
             else if (_headerType == 2 || _headerType == 3)
             {
                 Bloco bloco = new Bloco(_headerType, _archiveType, _formatType);
-                UpdatePlaylist_Ini(bloco);
+                updatePlaylist_Ini(bloco);
             }
         }
-        public void SaveBlockPlaylist_Ini() { 
+        public void Save() { 
             File.WriteAllLines(_path, _playlistIni);
         }
     }
