@@ -9,9 +9,6 @@ namespace IniEdit.src
     public class PlaylistIni
     {
         public string _path { get; set; }
-        public byte _headerType { get; set; }
-        public byte _archiveType { get; set; }
-        public byte _formatType { get; set; }
         private List<string> _playlistIni { get; set; }
         public Afiliadas afiliadas { get; set; } = new Afiliadas();
         public PlaylistIni(string path)
@@ -21,13 +18,20 @@ namespace IniEdit.src
                 _path = path;
                 _path += @"\PLAYLIST.ini";
                 readPlaylist_Ini();
+                Bloco teste = new();
+                Console.WriteLine(afiliadas.affiliateTable(_playlistIni));
             }
         }
-        public void addBlock(byte headerType, byte archiveType, byte formatType) {
-            _headerType = headerType;
-            _archiveType = archiveType;
-            _formatType = formatType;
-            readHeaderType();
+        
+        public void deleteAfiliada(string nameAfiliada) {
+            foreach (var item in _playlistIni)
+            {
+                if (item.StartsWith(nameAfiliada))
+                {
+                    _playlistIni.Remove(item);
+                    break;
+                }
+            }
         }
         public void addAfiliada(string nameAfiliada,string ipAfiliada) {
             afiliadas.Add(nameAfiliada,ipAfiliada);
@@ -112,15 +116,16 @@ namespace IniEdit.src
                 return false;
             }
         }
-        private void readHeaderType() {
-            if (_headerType == 0 || _headerType == 1)
+        public void addBlock(byte headerType, byte archiveType, byte formatType) {
+            
+            if (headerType == 0 || headerType == 1)
             {
-                Relogio relogio = new Relogio(_headerType, _archiveType, _formatType);
+                Relogio relogio = new Relogio(headerType, archiveType, formatType);
                 updatePlaylist_Ini(relogio);
             }
-            else if (_headerType == 2 || _headerType == 3)
+            else if (headerType == 2 || headerType == 3)
             {
-                Bloco bloco = new Bloco(_headerType, _archiveType, _formatType);
+                Bloco bloco = new Bloco(headerType, archiveType, formatType);
                 updatePlaylist_Ini(bloco);
             }
         }

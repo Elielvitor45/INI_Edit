@@ -16,6 +16,7 @@ namespace IniEdit.src
         public string format { get; set; }
         protected string type { get; set; }
         protected string diretory { get; set; }
+        public Relogio() { }
         public Relogio(byte headerType, byte ArchiveType, byte FormatType)
         {
             _headerType = headerType;
@@ -24,6 +25,81 @@ namespace IniEdit.src
             ReadHeader();
             ReadArchive();
             ReadFormat();
+        }
+        protected virtual string chekingFormat(string format)
+        {
+            if (format.EndsWith("TXT1"))
+            {
+                return "0@";
+            }
+            else if (format.EndsWith("DBF"))
+            {
+                return "1@";
+            }
+            else
+            {
+                return "3@";
+            }
+        }
+        protected string chekingArchive(string archive)
+        {
+            if (archive.EndsWith("a.txt"))
+            {
+                return "0@";
+            }
+            else if (archive.EndsWith("%d-%m-%Y.txt"))
+            {
+                return "2@";
+            }
+            else if (archive.EndsWith("%d-%m-%y.txt"))
+            {
+                return "3@";
+            }
+            else if (archive.EndsWith("%w.txt"))
+            {
+                return "4@";
+            }
+            else if (archive.EndsWith(""))
+            {
+                return "-1@";
+            }
+            else
+            {
+                return "1@";
+            }
+        }
+        protected string cheking(List<string> _playlistIni,string header) { 
+            var contain = _playlistIni.FirstOrDefault(x => x.Contains(header));
+            string cheking = "1@";
+            if (string.IsNullOrEmpty(contain))
+            {
+                cheking = string.Empty;
+            }
+            else
+            {
+                for (int i = 0; i < _playlistIni.Count; i++)
+                {
+                    if (_playlistIni[i].Equals(contain))
+                    {
+                        cheking += chekingFormat(_playlistIni[i+1]);
+                        if (_playlistIni.Count <= i+2)
+                        {
+                            _playlistIni.Add("");
+                        }
+                        cheking += chekingArchive(_playlistIni[i + 2]);
+                        break;
+                    }
+                }
+            }
+            return cheking;
+        }
+
+        public virtual string cheking(List<string> _playlistIni)
+        {
+            string check ="";
+            check += cheking(_playlistIni,"[RELOGIO COMERCIAL]");
+            check += cheking(_playlistIni,"[RELOGIO MUSICAL]");
+            return check;
         }
         protected virtual void ReadArchive() {
             if (_archiveType == 0)

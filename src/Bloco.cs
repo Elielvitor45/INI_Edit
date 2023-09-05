@@ -8,8 +8,26 @@ namespace IniEdit.src
 {
     public class Bloco:Relogio
     {
+        public Bloco():base() { }
         public Bloco(byte headerType, byte ArchiveType, byte FormatType):base(headerType, ArchiveType, FormatType)
         {
+        }
+        public override string cheking(List<string> _playlistIni)
+        {
+            string check = "";
+            check += cheking(_playlistIni,"[BLOCO COMERCIAL]");
+            check += cheking(_playlistIni,"[BLOCO MUSICAL]");
+            return check;
+        }
+        protected override string chekingFormat(string format) {
+            if (format.EndsWith("AUTO"))
+            {
+                return "2@";
+            }
+            else
+            {
+                return base.chekingFormat(format);
+            }
         }
         protected override void ReadArchive()
         {
@@ -38,7 +56,6 @@ namespace IniEdit.src
                 header = "[BLOCO COMERCIAL]";
                 diretory = "MAPAS";
                 type = "Mapa";
-
             }
             else if (_headerType == 3)
             {
