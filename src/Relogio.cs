@@ -11,20 +11,120 @@ namespace IniEdit.src
         protected byte _headerType { get; set; }
         protected byte _archiveType { get; set; }
         protected byte _formatType { get; set; }
-        public string header { get; set; }
-        public string archive { get; set; }
-        public string format { get; set; }
+        protected string headerMusical { get; set; }
+        protected string headerComercial { get; set; }
         protected string type { get; set; }
         protected string diretory { get; set; }
-        public Relogio() { }
-        public Relogio(byte headerType, byte ArchiveType, byte FormatType)
+        protected Relogio() { } 
+        public Relogio(List<string> playlistini)
         {
+            loadMusical(playlistini,"[RELOGIO MUSICAL]");
+            loadComercial(playlistini,"[RELOGIO COMERCIAL]");
+            cheking(playlistini);
+        }
+        public override string ToString()
+        {
+            string parseString = "---------------------------------------------\n";
+            parseString += headerMusical + "\n";
+            parseString += headerComercial;
+            parseString += "---------------------------------------------";
+            return parseString;
+        }
+        public string getMusical() {
+            if (!string.IsNullOrEmpty(headerMusical))
+            {
+                return headerMusical+"\n";
+            }
+            else
+            {
+                return "";
+            }
+        }
+        public string getComercial() {
+            if (!string.IsNullOrEmpty(headerComercial))
+            {
+                return headerComercial+"\n";
+            }
+            else
+            {
+                return "";
+            }
+        }
+        public void change(byte headerType, byte ArchiveType, byte FormatType) {
             _headerType = headerType;
             _archiveType = ArchiveType;
             _formatType = FormatType;
-            ReadHeader();
-            ReadArchive();
-            ReadFormat();
+            change();
+        }
+        protected virtual void change()
+        {
+            if (_headerType == 0)
+            {
+                if (string.IsNullOrEmpty(ReadHeader()))
+                {
+                    Console.WriteLine("ERRO");
+                    return;
+                }
+                headerComercial = ReadHeader()+"\n";
+                headerComercial += ReadFormat()+"\n";
+                headerComercial += ReadArchive()+"\n";
+            }
+            else if (_headerType == 1)
+            {
+                if (string.IsNullOrEmpty(ReadHeader()))
+                {
+                    Console.WriteLine("ERRO");
+                    return;
+                }
+                headerMusical = ReadHeader() + "\n";
+                headerMusical += ReadFormat() + "\n";
+                headerMusical += ReadArchive() + "\n";
+            }
+        }
+        protected virtual void loadComercial(List<string> _playlistIni,string header)
+        {
+            var contain = _playlistIni.FirstOrDefault(x => x.Contains(header));
+            if (!string.IsNullOrEmpty(contain))
+            {
+                for (int i = 0; i < _playlistIni.Count; i++)
+                {
+                    if (_playlistIni[i].Equals(contain))
+                    {
+                        headerComercial = _playlistIni[i]+"\n";
+                        headerComercial += _playlistIni[i + 1]+"\n";
+                        if (_playlistIni.Count > i+2)
+                        {
+                            headerComercial += _playlistIni[i + 2]+"\n";
+                        }
+                    }
+                }
+            }
+            else
+            {
+            }
+        }
+        protected virtual void loadMusical(List<string> _playlistIni,string header)
+        {
+            var contain = _playlistIni.FirstOrDefault(x => x.Contains(header));
+            bool condition = false;
+            if (!string.IsNullOrEmpty(contain))
+            {
+                for (int i = 0; i < _playlistIni.Count; i++)
+                {
+                    if (_playlistIni[i].Equals(contain))
+                    {
+                        headerMusical = _playlistIni[i] + "\n";
+                        headerMusical += _playlistIni[i + 1] + "\n";
+                        if (_playlistIni.Count > i + 2)
+                        {
+                            headerMusical += _playlistIni[i + 2] + "\n";
+                        }
+                    }
+                }
+            }
+            else
+            {
+            }
         }
         protected virtual string chekingFormat(string format)
         {
@@ -93,7 +193,6 @@ namespace IniEdit.src
             }
             return cheking;
         }
-
         public virtual string cheking(List<string> _playlistIni)
         {
             string check ="";
@@ -101,53 +200,55 @@ namespace IniEdit.src
             check += cheking(_playlistIni,"[RELOGIO MUSICAL]");
             return check;
         }
-        protected virtual void ReadArchive() {
+        protected virtual string ReadArchive() {
             if (_archiveType == 0)
             {
-                archive = $"ARQUIVO={diretory}\\{type}%a.txt";
+                return $"ARQUIVO={diretory}\\{type}%a.txt";
             } else if (_archiveType == 1) 
             {
-                archive = $"ARQUIVO={diretory}\\{type}.txt";
+                return $"ARQUIVO={diretory}\\{type}.txt";
             }
             else if (_archiveType == 2)
             {
-                archive = $"ARQUIVO={diretory}\\{type}%d-%m-%Y.txt";
+                return $"ARQUIVO={diretory}\\{type}%d-%m-%Y.txt";
             }
             else if (_archiveType == 3)
             {
-                archive = $"ARQUIVO={diretory}\\{type}%d-%m-%y.txt";
+                return $"ARQUIVO={diretory}\\{type}%d-%m-%y.txt";
             }
             else if (_archiveType == 4)
             {
-                archive = $"ARQUIVO={diretory}\\{type}%w.txt";
+                return $"ARQUIVO={diretory}\\{type}%w.txt";
             }
+            return "";
         }
-        protected virtual void ReadFormat()
+        protected virtual string ReadFormat()
         {
             if (_formatType == 0)
             {
-                format =  "FORMATO=TXT1";
+                return "FORMATO=TXT1";
             }
             else if (_formatType == 1)
             {
-                format = "FORMATO=DBF";
+                return "FORMATO=DBF";
             }
+            return "";
         }
-        protected virtual void ReadHeader()
+        protected virtual string ReadHeader()
         {
             if (_headerType == 0)
             {
-                header = "[RELOGIO COMERCIAL]";
                 diretory = "MAPAS";
                 type = "Relogio";
+                return "[RELOGIO COMERCIAL]";
             }
             else if (_headerType == 1)
             {
-                header = "[RELOGIO MUSICAL]";
                 diretory = "GRADES";
                 type = "Relogio";
-
+                return "[RELOGIO MUSICAL]";
             }
+            return "";
         }
     }
 }

@@ -8,9 +8,12 @@ namespace IniEdit.src
 {
     public class Bloco:Relogio
     {
-        public Bloco():base() { }
-        public Bloco(byte headerType, byte ArchiveType, byte FormatType):base(headerType, ArchiveType, FormatType)
+  
+        public Bloco(List<string> playlistini):base()
         {
+            loadMusical(playlistini, "[BLOCO MUSICAL]");
+            loadComercial(playlistini,"[BLOCO COMERCIAL]");
+            cheking(playlistini);
         }
         public override string cheking(List<string> _playlistIni)
         {
@@ -29,40 +32,65 @@ namespace IniEdit.src
                 return base.chekingFormat(format);
             }
         }
-        protected override void ReadArchive()
+        protected override string ReadArchive()
         {
             if (_formatType == 2)
             {
-                archive = "";
+                return "";
             }
             else 
             {
-                base.ReadArchive();
+                return base.ReadArchive();
             }
         }
-        protected override void ReadFormat() {
+        protected override string ReadFormat() {
             if (_formatType == 2)
             {
-                format = "FORMATO=AUTO";
+                return"FORMATO=AUTO";
             }
             else { 
-                base.ReadFormat(); 
+                return base.ReadFormat(); 
             }
         }
-        protected override void ReadHeader()
+        protected override string ReadHeader()
         {
             if (_headerType == 2)
             {
-                header = "[BLOCO COMERCIAL]";
                 diretory = "MAPAS";
                 type = "Mapa";
+                return "[BLOCO COMERCIAL]";
             }
             else if (_headerType == 3)
             {
-                header = "[BLOCO MUSICAL]";
                 diretory = "GRADES";
                 type = "Grade";
-
+                return "[BLOCO MUSICAL]";
+            }
+            return "";
+        }
+        protected override void change()
+        {
+            if (_headerType == 2)
+            {
+                if (string.IsNullOrEmpty(ReadHeader()))
+                {
+                    Console.WriteLine("ERRO");
+                    return;
+                }
+                headerComercial = ReadHeader() + "\n";
+                headerComercial += ReadFormat() + "\n";
+                headerComercial += ReadArchive() + "\n";
+            }
+            else if (_headerType == 3)
+            {
+                if (string.IsNullOrEmpty(ReadHeader()))
+                {
+                    Console.WriteLine("ERRO");
+                    return;
+                }
+                headerMusical = ReadHeader() + "\n";
+                headerMusical += ReadFormat() + "\n";
+                headerMusical += ReadArchive() + "\n";
             }
         }
     }
