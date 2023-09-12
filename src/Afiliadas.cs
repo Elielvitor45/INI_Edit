@@ -16,8 +16,8 @@ namespace IniEdit.src
         private List<Afiliada> listAfiliada { get; set; } = new List<Afiliada>();
         public override string ToString()
         {
-            string parseString = "Lista de Afiliadas----------------------------------";
-            for (int i = 0; i < listAfiliada.Count;)
+            string parseString = "Lista de Afiliadas----------------------------------\n";
+            for (int i = 0; i < listAfiliada.Count;i++)
             {
                 if (listAfiliada.Count == 0)
                 {
@@ -43,10 +43,34 @@ namespace IniEdit.src
             }
             return afiliada;
         }
-        public void Add(string nameAfiliada,string ipAfiliada)
+        public bool Add(string nameAfiliada,string ipAfiliada)
         {
-            Afiliada afiliada = new(nameAfiliada, ipAfiliada);
-            listAfiliada.Add(afiliada);
+            if (ipAfiliada.Contains(":"))
+            {
+                int index = ipAfiliada.IndexOf(":");
+                int port;
+                if (int.TryParse(ipAfiliada.Substring(index+1),out port))
+                {
+                    if (port >= 1 && port < 65535 )
+                    {
+                        Afiliada afiliada = new(nameAfiliada, ipAfiliada);
+                        listAfiliada.Add(afiliada);
+                        return true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Porta Invalida!");
+                        return false;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Porta Invalida!");
+                    return false;
+                }
+            }
+            Console.WriteLine("Ip digitado Incorreto!");
+            return false;
         }
         public bool delete(string nameAfiliada)
         {
@@ -105,7 +129,7 @@ namespace IniEdit.src
                         {
                             break;
                         }
-                        else if (!_playlistIni[i+1].StartsWith("["))
+                        else if (!_playlistIni[i+1].StartsWith("[") && !string.IsNullOrEmpty(_playlistIni[i + 1]) )
                         {
                             Add(_playlistIni[i + 1].Split('=')[0], _playlistIni[i + 1].Split('=')[1]);                         
                         }

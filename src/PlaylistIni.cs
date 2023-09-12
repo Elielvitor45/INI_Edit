@@ -18,16 +18,22 @@ namespace IniEdit.src
             {
                 _path = path;
                 _path += @"\PLAYLIST.ini";
-                List<string> linhas = File.ReadAllLines(_path).ToList();
-                if (linhas.Count > 0)
+                List<string> linhas;
+                if (File.Exists(_path))
                 {
-                    afiliadas = new Afiliadas(linhas);
-                    relogio = new Relogio(linhas);
-                    bloco = new Bloco(linhas);
+                    linhas = File.ReadAllLines(_path).ToList();
+                    if (linhas.Count > 0)
+                    {
+                        afiliadas = new Afiliadas(linhas);
+                        relogio = new Relogio(linhas);
+                        bloco = new Bloco(linhas);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Playlist.Ini não existe");
+                    }
                 }
-                else
-                {
-                }
+                
             }
         }
         public void Save() {

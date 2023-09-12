@@ -1,4 +1,6 @@
-﻿namespace IniEdit.src
+﻿using System.ComponentModel.Design;
+
+namespace IniEdit.src
 {
     internal class Program
     {
@@ -18,14 +20,17 @@
                 Console.WriteLine("Relogio: (2)");
                 Console.WriteLine("Afiliada: (3)");
                 Console.WriteLine("Imprimir PlaylistIni: (4)");
+                Console.WriteLine("Save: (5)");
                 Console.WriteLine("-----------------------------------------");
                 menu = byte.Parse(Console.ReadLine());
                 Console.Clear();
                 if (menu == 1)
                 {
+                    Console.WriteLine("Menu Blocos------------------------------");
                     Console.WriteLine("Adicionar Bloco Comercial: (1)");
                     Console.WriteLine("Adicionar Bloco Musical: (2)");
                     Console.WriteLine("Imprimir Blocos: (3)");
+                    Console.WriteLine("-----------------------------------------");
                     menu2 = byte.Parse(Console.ReadLine());
                     Console.Clear();
                     if (menu2 == 1)
@@ -93,9 +98,11 @@
                 }
                 else if (menu == 2)
                 {
+                    Console.WriteLine("Menu Relogio---------------------------------");
                     Console.WriteLine("Adicionar Relogio Comercial: (1)");
                     Console.WriteLine("Adicionar Relogio Musical: (2)");
                     Console.WriteLine("Imprimir Relogios: (3)");
+                    Console.WriteLine("---------------------------------------------");
                     menu2 = byte.Parse(Console.ReadLine());
                     Console.Clear();
                     if (menu2==1)
@@ -161,27 +168,29 @@
                 } 
                 else if (menu == 3)
                 {
+                    Console.WriteLine("Menu Afiliada-----------------------------------");
                     Console.WriteLine("Adicionar Afiliada: (1)");
                     Console.WriteLine("Adicionar Afiliadas: (2)");
                     Console.WriteLine("Deletar Afiliada: (3)");
                     Console.WriteLine("Deletar Afiliadas: (4)");
                     Console.WriteLine("Imprimir Afiliadas: (5)");
+                    Console.WriteLine("------------------------------------------------");
                     menu2 = byte.Parse(Console.ReadLine());
                     Console.Clear();
                     if (menu2 == 1)
                     {
-                        string nameAfiliada,ipafiliada;
+                        string nameAfiliada, ipafiliada;
                         Console.WriteLine("Digite o nome da Afiliada: ");
-                        nameAfiliada= Console.ReadLine();
+                        nameAfiliada = Console.ReadLine();
                         Console.WriteLine("Digite o ip da Afiliada: ");
-                        ipafiliada= Console.ReadLine();
-                        Playlist.afiliadas.Add(nameAfiliada,ipafiliada);
+                        ipafiliada = Console.ReadLine();
+                        Playlist.afiliadas.Add(nameAfiliada, ipafiliada);
                         Console.WriteLine("Adição Feita com sucesso!");
                         Console.Clear();
                     }
                     else if (menu2 == 2)
                     {
-                        int count=1;
+                        int count = 1;
                         do
                         {
                             string nameAfiliada, ipafiliada;
@@ -189,38 +198,73 @@
                             nameAfiliada = Console.ReadLine();
                             Console.WriteLine("Digite o ip da Afiliada: ");
                             ipafiliada = Console.ReadLine();
-                            Playlist.afiliadas.Add(nameAfiliada, ipafiliada);
-                            Console.WriteLine("Adição Feita com sucesso!");
+                            if (Playlist.afiliadas.Add(nameAfiliada, ipafiliada))
+                            {
+                                Console.WriteLine("Adição Feita com sucesso!");
+                                Console.Clear();
+                                Console.WriteLine("Continuar Adicionando?: (1)");
+                                count = int.Parse(Console.ReadLine());
+                            }
+                            else
+                            {
+                                Console.WriteLine("Adição Falhou");
+                                count = 2;
+                            }
                             Console.Clear();
-                            Console.WriteLine("Continuar Adicionando?: (1)");
-                            count = int.Parse(Console.ReadLine());
-                            Console.Clear();
-                        } while (count==1);
-
-
-
-
+                        } while (count == 1);
                     }
                     else if (menu2 == 3)
                     {
+                        Console.WriteLine(Playlist.afiliadas.ToString());
+                        Console.WriteLine("Digite o nome ou o Index para deletar a afiliada");
+                        string nameAfiliada = Console.ReadLine();
+                        byte indexAfiliada = 0;
+                        if (byte.TryParse(nameAfiliada,out indexAfiliada)) {
+                            Playlist.afiliadas.delete(indexAfiliada);
+                        }
+                        else
+                        {
+                            Playlist.afiliadas.delete(nameAfiliada);
+                        }
 
+                        Console.WriteLine("Afiliada Deletada com sucesso!!");
+                        Console.Clear();
                     }
                     else if (menu2 == 4)
                     {
-
+                        Console.WriteLine(Playlist.afiliadas.ToString());
+                        Console.WriteLine("Numero de Afiliadas a deletar: ");
+                        byte num = byte.Parse(Console.ReadLine());
+                        List<byte> bytes = new List<byte>();
+                        for (int i = 0; i < num; i++)
+                        {
+                            Console.WriteLine("Index da afiliada a ser deletada:");
+                            bytes.Add(byte.Parse(Console.ReadLine()));
+                        }
+                        Playlist.afiliadas.deleteAfiliadas(bytes);
+                        Console.WriteLine("Afiliadas deletado com sucesso!!");
+                        Console.Clear();
                     }
-                    else if (menu == 5)
+                    else if (menu2 == 5)
                     {
-
+                        Console.WriteLine(Playlist.afiliadas.ToString());
+                        Console.ReadKey();
+                        Console.Clear ();
                     }
-
-
                 }
                 else if (menu == 4)
                 {
                     Console.WriteLine(Playlist.ToString());
                     Console.ReadKey();
                     Console.Clear();
+                }
+                else if (menu == 5)
+                {
+                    Playlist.Save();
+                    Console.WriteLine("Salvo com Sucesso!");
+                    Console.ReadKey();
+                    Console.Clear();
+
                 }
             } while (menu!=0);
         }
