@@ -74,6 +74,10 @@ namespace IniEdit.src
         }
         public bool delete(string nameAfiliada)
         {
+            if (string.IsNullOrEmpty(nameAfiliada))
+            {
+                return false;
+            }
             foreach (var item in listAfiliada)
             {
                 if (item.getNameAfiliada().Equals(nameAfiliada))
